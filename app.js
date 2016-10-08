@@ -69,7 +69,7 @@ bot.onText(/\/start/, function(msg) {
 bot.onText(/\/close/, function(msg) {
     var fromId = msg.chat.id;
     var game = games[fromId];
-    if (game.player.length < 2) {
+    if (game.players.length < 2) {
         bot.sendMessage(fromId, 'You need at least 2 players');
     }
     else if (game.join === true) {
