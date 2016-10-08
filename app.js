@@ -323,7 +323,12 @@ function endTurn(chatId, game) {
         game.players.splice(value-index, 1);
     });
 
-    beginRollDice(chatId, game.currentPlayer, game) 
+    if (game.players.length === 1) {
+        win(chatId, game.players[0]);
+    }
+    else {
+        beginRollDice(chatId, game.currentPlayer, game)
+    } 
 }
 
 function resolve(game) {
@@ -406,4 +411,9 @@ function attack(game) {
 
 function checkPlayerLife(player) {
     if (player.life < 0) player.life = 0;
+}
+
+function win(chatId, player) {
+    bot.sendMessage(chatId, '@' + player.name + ' won!\nScore: ' + player.score);
+    delete games[chatId];
 }
