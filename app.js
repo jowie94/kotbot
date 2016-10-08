@@ -317,8 +317,8 @@ function createDiceKey(value, selected, marks) {
 
 function endTurn(chatId, game) {
     bot.sendMessage(chatId, 
-        '@' + game.currentPlayer.name + ' stats:\n- Score: ' + game.currentPlayer.score
-        + '\n- Life: ' + game.currentPlayer.life + '\n- Energy: ' + game.currentPlayer.energy);
+        '@' + game.currentPlayer.name + ' stats:\n- ' + emojis[6] + ': ' + game.currentPlayer.score
+        + '\n- ' + emojis[dices.HEART] + ': ' + game.currentPlayer.life + '\n- ' + emojis[dices.ENERGY] + ': ' + game.currentPlayer.energy);
     game.dices = [-1, -1, -1, -1, -1, -1];
     game.selected_dices = [false, false, false, false, false, false]
     game.currentPlayer = game.players[++game.currentPlayerPos % game.players.length]
@@ -410,7 +410,7 @@ function resolve(game) {
         
         bot.sendMessage(game.id, '@' + game.tokyo.name + ' do you want to leave tokyo?', {'reply_markup': keyboard});
     } else {
-        endTurn(game.id, game);
+        setTimeout(function () {endTurn(game.id, game);}, 500)
     }
 }
 
