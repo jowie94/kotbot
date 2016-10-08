@@ -157,6 +157,7 @@ bot.on('callback_query', function(msg) {
     if (game.state === GameStates.DICESELECT && msg.from.id === game.currentPlayer.id) {
         if (msg.data.contains('dice_')) {
             var options = {};
+            var the_message = msg.message.text;
 
             if (msg.data === 'dice_done') {
                 var dicesToChange = [];
@@ -172,7 +173,8 @@ bot.on('callback_query', function(msg) {
                 var emoji = toEmoji(game.dices);
                 var delay=500; //1 second
                 
-                bot.sendMessage(msg.message.chat.id, 'Final result:\n' + emoji);
+                // bot.sendMessage(msg.message.chat.id, 'Final result:\n' + emoji);
+                the_message = 'Final result:\n' + emoji;
                 
                 setTimeout(function() {
                     resolve(game);
@@ -184,7 +186,7 @@ bot.on('callback_query', function(msg) {
                 options['inline_keyboard'] = createDiceKeyboard(game);
             }
 
-            bot.editMessageText(msg.message.text, {
+            bot.editMessageText(the_message, {
                     'message_id': msg.message.message_id,
                     'chat_id': msg.message.chat.id,
                     'reply_markup': options
@@ -271,7 +273,7 @@ function changeDices(chatId, game) {
         'inline_keyboard': createDiceKeyboard(game)
     };
 
-    bot.sendMessage(chatId, '@' + game.currentPlayer.name + ' do you want to change any dice?\nWrite the dice positions on your checkbox.', {'reply_markup': cancelKeyboard});
+    bot.sendMessage(chatId, '@' + game.currentPlayer.name + ' do you want to change any dice?', {'reply_markup': cancelKeyboard});
 
 }
 
@@ -314,6 +316,9 @@ function createDiceKey(value, selected, marks) {
 }
 
 function endTurn(chatId, game) {
+    bot.sendMessage(chatId, 
+        '@' + game.currentPlayer.name + ' stats:\n- Score: ' + game.currentPlayer.score
+        + '\n- Life: ' + game.currentPlayer.life + '\n- Energy: ' + game.currentPlayer.energy);
     game.dices = [-1, -1, -1, -1, -1, -1];
     game.selected_dices = [false, false, false, false, false, false]
     game.currentPlayer = game.players[++game.currentPlayerPos % game.players.length]
