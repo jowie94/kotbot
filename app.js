@@ -36,7 +36,8 @@ var emojis = [
     '\u0033\u20E3',
     '\u26A1',
     '\u2694',
-    '\u2665'
+    '\u2665',
+    '\u2B50'
 ]
 
 bot.onText(/\/echo/, function(msg) {
