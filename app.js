@@ -461,3 +461,5 @@ function score(chatId, player, amount) {
     player.score += amount;
     bot.sendMessage(chatId, 'Player @' + player.name + ' scored ' + amount + ' points.')
 }
+
+console.log('Server started!');
