@@ -326,7 +326,6 @@ function endTurn(chatId, game) {
         + '\n- ' + emojis[dices.HEART] + ': ' + game.currentPlayer.life + '\n- ' + emojis[dices.ENERGY] + ': ' + game.currentPlayer.energy);
     game.dices = [-1, -1, -1, -1, -1, -1];
     game.selected_dices = [false, false, false, false, false, false]
-    game.currentPlayer = game.players[++game.currentPlayerPos % game.players.length]
     var todelete = [];
     game.players.forEach((value, index) => {
         if (value.life === 0) {
@@ -350,6 +349,8 @@ function endTurn(chatId, game) {
         win(chatId, game.currentplayer);
     }
     else {
+        game.currentPlayer = game.players[++game.currentPlayerPos % game.players.length]
+        
         if (game.tokyo && game.currentPlayer.id === game.tokyo.id) {
             score(chatId, game.currentPlayer, 2);
         }
