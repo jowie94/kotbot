@@ -17,7 +17,17 @@ var games = {};
 var GameStates = {
     JOINING: 0,
     PREROLL: 1,
-    DICESELECT: 2
+    DICESELECT: 2,
+    RESOLVE: 3
+}
+
+var dices = {
+    ONE: 0,
+    TWO: 1,
+    THREE: 2,
+    ENERGY: 3,
+    ATTACK: 4,
+    HEART: 5
 }
 
 var emojis = [
@@ -41,12 +51,14 @@ bot.onText(/\/start/, function(msg) {
     }
     else {
         var game = {
+            'id': fromId,
             'players': [],
             'join': true,
             'tokyo': undefined,
             'state': GameStates.JOINING,
             'dices': [-1, -1, -1, -1, -1, -1],
-            'selected_dices': [false, false, false, false, false, false]
+            'selected_dices': [false, false, false, false, false, false],
+            'currentPlayerPos': -1
         };
         games[fromId] = game;
         bot.sendMessage(fromId, 'GAME STARTED!.\nJoin the game typing /join in the chat.\nStart playing typing /close.');
@@ -59,7 +71,8 @@ bot.onText(/\/close/, function(msg) {
     if (game.join === true) {
         game.join = false;
         //bot.sendMessage(fromId, 'No more players are accepted.');
-        game.currentPlayer = game.players[0].id;
+        game.currentPlayer = game.players[0];
+        game.currentPlayerPos = 0;
         bot.sendMessage(fromId, 'No more players are accepted.\nPlayer @' + game.players[0].name + ' starts.');
         //bot.sendMessage(fromId, 'Player @' + game.players[0].name + ' starts');
         beginRollDice(fromId, game.players[0], game);
@@ -115,7 +128,7 @@ bot.onText(/Roll the dice/, function(msg) {
     }
 
     var game = games[fromId];
-    if (game.currentPlayer !== msg.from.id) {
+    if (game.currentPlayer.id !== msg.from.id) {
         bot.sendMessage(fromId, 'It isn\'t your turn', {'reply_to_message_id': msg.message_id});
         return;
     }
@@ -159,6 +172,8 @@ bot.on('callback_query', function(msg) {
 
                 var emoji = toEmoji(game.dices);
                 bot.sendMessage(msg.message.chat.id, 'Final result:\n' + emoji);
+
+                resolve(game);
             }
             else {
                 var index = parseInt(msg.data.replace('dice_', ''));
@@ -255,5 +270,88 @@ function endTurn(chatId, game) {
     game.dices = [-1, -1, -1, -1, -1, -1];
     game.selected_dices = [false, false, false, false, false, false]
     //p = (game.currentPlayer + 1) % game.players.length;
-    beginRollDice(chatId, game.players[p], game) 
+    beginRollDice(chatId, game.players[++game.currentPlayerPos % game.players.length], game) 
+}
+
+function resolve(game) {
+    var num = [0, 0, 0];
+    var move = false;
+    var life_taken = 0;
+    var old_life = game.currentPlayer.life;
+    var old_tokyo = 0;
+    if (game.tokyo) {
+        old_tokyo = game.tokyo.life;
+    }
+    var old_energy = game.currentPlayer.energy;
+    var old_lifes = game.players.map((value) => value.life);
+    game.dices.forEach((value) => {
+        if (value < 3) {
+            num[value]++;
+        }
+        else if (value === dices.ENERGY) {
+            game.currentPlayer.energy++;
+        }
+        else if (value === dices.ATTACK) {
+            life_taken++;
+            move = !game.tokyo;
+            if (!move)
+                attack(game);
+        }
+        else if (value === dices.HEART && game.currentPlayer.life < 10) {
+            game.currentPlayer.life++;
+        }
+    });
+
+    if (old_life < game.currentPlayer.life) {
+        bot.sendMessage(game.id, '@' + game.currentPlayer.name + '\'s life increased ' + (game.currentPlayer.life - old_life) + ' point(s)');
+    }
+
+    var msg = '';
+
+    game.players.filter((value, index) => value.id !== game.currentPlayer.id && value.life < old_lifes[index].life)
+        .forEach((value) => {
+            msg += '@' + value.name + ' lost ' + life_taken + ' points of life:' + value.life + '\n';
+        });
+
+    if (msg) {
+        bot.sendMessage(game.id, msg);
+    }
+
+    if (move) {
+        game.tokyo = game.currentPlayer;
+        game.tokyo.score += 1;
+    }
+
+    if (game.tokyo && game.currentPlayer.id !== game.tokyo.id && old_tokyo > game.tokyo.life) {
+        var keyboard = [
+            [
+                {
+                    'text': 'Yes',
+                    'callback_data': 'tokyo_yes'
+                },
+                {
+                    'text': 'No',
+                    'callback_data': 'tokyo_no'
+                }
+            ]
+        ];
+        bot.sendMessage(game.id, '@' + game.tokyo.name + ' do you want to leave tokyo?', {'reply_markup': keyboard});
+    } else {
+        endTurn(game.id, game);
+    }
+}
+
+function attack(game) {
+    if (game.currentPlayer.id === game.tokyo.id) {
+        game.players.filter((value) => value.id !== game.currentPlayer.id).forEach((value) => {
+            value.life--;
+        });
+    }
+    else {
+        game.tokyo.life--;
+    }
+}
+
+function checkPlayerLife(player) {
+
 }
