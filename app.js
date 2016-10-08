@@ -332,6 +332,10 @@ function endTurn(chatId, game) {
     game.players.forEach((value, index) => {
         if (value.life === 0) {
             todelete.push(index);
+            if (game.tokyo && value.id === game.tokyo) {
+                game.tokyo = game.currentPlayer;
+                bot.sendMessage(game.id, 'The new King of Tokyo is @'+game.currentPlayer.name);
+            }
         }
     });
 
