@@ -13,9 +13,13 @@ var GameStates = {
 }
 
 var emojis = [
-
+    '\u0030\u20E3',
+    '\u0031\u20E3',
+    '\u0032\u20E3',
+    '\u2733',
+    '\u271D',
+    '\u2665'
 ]
-
 
 bot.onText(/\/echo/, function(msg) {
     var fromId = msg.chat.id;
@@ -113,7 +117,7 @@ bot.onText(/Roll the dice/, function(msg) {
 
     var result = rollDices(6);
     var str = '';
-    result.forEach((value, index) => str += (index + 1) + '. ' + value + '\n');
+    result.forEach((value, index) => str += (index + 1) + '. ' + emojis[value] + '\n');
     bot.sendMessage(fromId, 'Result:\n' + str);
     game.state = GameStates.DICESELECT;
 });
