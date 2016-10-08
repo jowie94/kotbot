@@ -160,6 +160,8 @@ bot.onText(/Roll the dice/, function(msg) {
 });
 
 bot.onText(/\/stats/, function (msg) {
+    var fromId = msg.chat.id;
+
     if (!gameIsRunning(fromId)) {
         bot.sendMessage(fromId, 'There is no game running on this chat!');
         return;
@@ -343,7 +345,7 @@ function createDiceKey(value, selected, marks) {
 
 function endTurn(chatId, game) {
     bot.sendMessage(chatId, 
-        '@' + game.currentPlayer.name + ' stats:\n' + createStats(game.currentPlayer);
+        '@' + game.currentPlayer.name + ' stats:\n' + createStats(game.currentPlayer));
     game.dices = [-1, -1, -1, -1, -1, -1];
     game.selected_dices = [false, false, false, false, false, false]
     var todelete = [];
