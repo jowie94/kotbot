@@ -113,7 +113,7 @@ bot.onText(/\/join/, function(msg) {
             'name': msg.from.username,
             'life': 10,
             'score': 0,
-            'power': 0
+            'energy': 0
         };
         game.players.push(player);
 
@@ -332,6 +332,9 @@ function endTurn(chatId, game) {
         win(chatId, game.players[0]);
     }
     else {
+        if (game.tokyo && game.currentPlayer.id === game.tokyo.id) {
+            score(chatId, game.currentPlayer, 2);
+        }
         beginRollDice(chatId, game.currentPlayer, game)
     } 
 }
@@ -383,8 +386,13 @@ function resolve(game) {
 
     if (move) {
         game.tokyo = game.currentPlayer;
-        game.tokyo.score += 1;
+        score(game.id, game.currentPlayer, 1);
         bot.sendMessage(game.id, 'The new King of Tokyo is @'+game.currentPlayer.name);
+    }
+
+    if (game.currentPlayer.energy >= 5) {
+        score(game.id, game.currentPlayer, Math.floor(game.currentPlayer.energy / 5));
+        game.currentPlayer.energy %= 5;
     }
 
     if (game.tokyo && game.currentPlayer.id !== game.tokyo.id && old_tokyo > game.tokyo.life) {
@@ -421,4 +429,9 @@ function checkPlayerLife(player) {
 function win(chatId, player) {
     bot.sendMessage(chatId, '@' + player.name + ' won!\nScore: ' + player.score);
     delete games[chatId];
+}
+
+function score(chatId, player, amount) {
+    player.score += amount;
+    bot.sendMessage(chatId, 'Player @' + player.name + ' scored ' + amount + ' points.')
 }
