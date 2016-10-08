@@ -153,18 +153,16 @@ bot.on('callback_query', function(msg) {
     var fromId = msg.id;
     var game = games[msg.message.chat.id];
 
-    if (game.state === GameStates.DICESELECT) {
+    if (game.state === GameStates.DICESELECT && msg.from.id === game.currentPlayer.id) {
         if (msg.data.contains('dice_')) {
             var options = {};
 
             if (msg.data === 'dice_done') {
-                bot.answerCallbackQuery(fromId, 'Dice change cancelled');
                 var dicesToChange = [];
                 game.selected_dices.forEach((value, index) => {
                     if (value)
                         dicesToChange.push(index);
                 });
-                console.log(dicesToChange);
                 var newDices = rollDices(dicesToChange.length);
                 dicesToChange.forEach((value, index) => {
                     game.dices[value] = newDices[index];
@@ -269,8 +267,9 @@ function createDiceKey(value, selected, marks) {
 function endTurn(chatId, game) {
     game.dices = [-1, -1, -1, -1, -1, -1];
     game.selected_dices = [false, false, false, false, false, false]
+    game.currentPlayer = game.players[++game.currentPlayerPos % game.players.length]
     //p = (game.currentPlayer + 1) % game.players.length;
-    beginRollDice(chatId, game.players[++game.currentPlayerPos % game.players.length], game) 
+    beginRollDice(chatId, game.currentPlayer, game) 
 }
 
 function resolve(game) {
@@ -320,21 +319,17 @@ function resolve(game) {
     if (move) {
         game.tokyo = game.currentPlayer;
         game.tokyo.score += 1;
+        bot.sendMessage(game.id, 'The new King of Tokyo is @'+game.currentPlayer.name);
     }
 
     if (game.tokyo && game.currentPlayer.id !== game.tokyo.id && old_tokyo > game.tokyo.life) {
-        var keyboard = [
-            [
-                {
-                    'text': 'Yes',
-                    'callback_data': 'tokyo_yes'
-                },
-                {
-                    'text': 'No',
-                    'callback_data': 'tokyo_no'
-                }
-            ]
-        ];
+        var keyboard = {
+            'resize_keyboard': true,
+            'one_time_keyboard': true,
+            'selective': true,
+            'keyboard': [['Yes, I want to leave tokyo', 'No, I don\'t want to leave tokyo']]
+        };
+        
         bot.sendMessage(game.id, '@' + game.tokyo.name + ' do you want to leave tokyo?', {'reply_markup': keyboard});
     } else {
         endTurn(game.id, game);
