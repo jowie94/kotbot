@@ -307,9 +307,9 @@ function resolve(game) {
 
     var msg = '';
 
-    game.players.filter((value, index) => value.id !== game.currentPlayer.id && value.life < old_lifes[index].life)
+    game.players.filter((value, index) => value.id !== game.currentPlayer.id && value.life < old_lifes[index])
         .forEach((value) => {
-            msg += '@' + value.name + ' lost ' + life_taken + ' points of life:' + value.life + '\n';
+            msg += '@' + value.name + ' lost ' + life_taken + ' points of life :' + value.life + '\n';
         });
 
     if (msg) {
@@ -338,8 +338,8 @@ function resolve(game) {
 
 function attack(game) {
     if (game.currentPlayer.id === game.tokyo.id) {
-        game.players.filter((value) => value.id !== game.currentPlayer.id).forEach((value) => {
-            value.life--;
+        game.players.filter((value) => value.id !== game.currentPlayer.id).forEach((player) => {
+            player.life--;
         });
     }
     else {
