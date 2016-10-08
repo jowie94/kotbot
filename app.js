@@ -369,7 +369,7 @@ function resolve(game) {
             if (!move)
                 attack(game);
         }
-        else if (game.currentPlayer.id !== game.tokyo.id && value === dices.HEART && game.currentPlayer.life < 10) {
+        else if (value === dices.HEART && game.currentPlayer.life < 10 && (!game.tokyo || game.currentPlayer.id !== game.tokyo.id)) {
             game.currentPlayer.life++;
         }
     });
