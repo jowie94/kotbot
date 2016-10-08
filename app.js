@@ -52,7 +52,7 @@ bot.onText(/\/start/, function(msg) {
     }
     else {
         console.log('Game started, game id: ' + fromId);
-        console.log(games.length + ' games in total running');
+        console.log(Object.keys(games).length + ' games are running in total');
         var game = {
             'id': fromId,
             'players': [],
@@ -331,6 +331,7 @@ function endTurn(chatId, game) {
     game.players.forEach((value, index) => {
         if (value.life === 0) {
             todelete.push(index);
+            bot.sendMessage(chatId, '@' + value.name + ' is dead')
             if (game.tokyo && value.id === game.tokyo) {
                 game.tokyo = game.currentPlayer;
                 bot.sendMessage(game.id, 'The new King of Tokyo is @'+game.currentPlayer.name);
