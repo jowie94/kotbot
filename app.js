@@ -237,7 +237,7 @@ function createDiceKeyboard(game) {
 }
 
 function toEmoji(dices) {
-    str = '';
+    var str = '';
     dices.forEach((value, index) => str += emojis[value]);
     return str;
 }
@@ -249,4 +249,11 @@ function createDiceKey(value, selected, marks) {
     }
 
     return msg;
+}
+
+function endTurn(chatId, game) {
+    game.dices = [-1, -1, -1, -1, -1, -1];
+    game.selected_dices = [false, false, false, false, false, false]
+    //p = (game.currentPlayer + 1) % game.players.length;
+    beginRollDice(chatId, game.players[p], game) 
 }
