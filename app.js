@@ -238,7 +238,7 @@ function createDiceKeyboard(game) {
 
 function toEmoji(dices) {
     str = '';
-    dices.forEach((value, index) => str += (index + 1) + '. ' + emojis[value] + '\n');
+    dices.forEach((value, index) => str += emojis[value]);
     return str;
 }
 
