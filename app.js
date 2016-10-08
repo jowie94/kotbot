@@ -338,7 +338,7 @@ function resolve(game) {
     }
     var old_energy = game.currentPlayer.energy;
     var old_lifes = game.players.map((value) => value.life);
-    games.dices.forEach((value) => {
+    game.dices.forEach((value) => {
         if (value < 3) {
             num[value]++;
         }
