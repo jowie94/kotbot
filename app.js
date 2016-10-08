@@ -336,11 +336,14 @@ function endTurn(chatId, game) {
     if (game.players.length === 1) {
         win(chatId, game.players[0]);
     }
+    else if (game.currentPlayer.scores >= 20) {
+        win(chatId, game.currentplayer);
+    }
     else {
         if (game.tokyo && game.currentPlayer.id === game.tokyo.id) {
             score(chatId, game.currentPlayer, 2);
         }
-        beginRollDice(chatId, game.currentPlayer, game)
+        beginRollDice(chatId, game.currentPlayer, game);
     } 
 }
 
