@@ -31,9 +31,9 @@ var dices = {
 }
 
 var emojis = [
-    '\u0030\u20E3',
     '\u0031\u20E3',
     '\u0032\u20E3',
+    '\u0033\u20E3',
     '\u26A1',
     '\u2694',
     '\u2665'
@@ -169,8 +169,11 @@ bot.on('callback_query', function(msg) {
                 });
 
                 var emoji = toEmoji(game.dices);
-                bot.sendMessage(msg.message.chat.id, 'Final result:\n' + emoji);
-
+                var delay=500; //1 second
+                setTimeout(function() {
+                    bot.sendMessage(msg.message.chat.id, 'Final result:\n' + emoji);
+                }, delay);
+                
                 resolve(game);
             }
             else {
