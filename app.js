@@ -170,11 +170,12 @@ bot.on('callback_query', function(msg) {
 
                 var emoji = toEmoji(game.dices);
                 var delay=500; //1 second
-                setTimeout(function() {
-                    bot.sendMessage(msg.message.chat.id, 'Final result:\n' + emoji);
-                }, delay);
                 
-                resolve(game);
+                bot.sendMessage(msg.message.chat.id, 'Final result:\n' + emoji);
+                
+                setTimeout(function() {
+                    resolve(game);
+                }, delay);
             }
             else {
                 var index = parseInt(msg.data.replace('dice_', ''));
