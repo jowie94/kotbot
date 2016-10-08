@@ -4,6 +4,14 @@ var token = process.env.bot_key;
 
 var bot = new TelegramBot(token, {polling: true});
 
+String.prototype.contains = function (v) {
+    return this.indexOf(v) > -1;
+}
+
+Array.prototype.contains = function (v) {
+    return this.indexOf(v) > -1;
+}
+
 var games = {};
 
 var GameStates = {
@@ -36,7 +44,9 @@ bot.onText(/\/start/, function(msg) {
             'players': [],
             'join': true,
             'tokyo': undefined,
-            'state': GameStates.JOINING
+            'state': GameStates.JOINING,
+            'dices': [-1, -1, -1, -1, -1, -1],
+            'selected_dices': [false, false, false, false, false, false]
         };
         games[fromId] = game;
         bot.sendMessage(fromId, 'GAME STARTED!.\nJoin the game typing /join in the chat.\nStart playing typing /close.');
@@ -116,10 +126,53 @@ bot.onText(/Roll the dice/, function(msg) {
     }
 
     var result = rollDices(6);
-    var str = '';
-    result.forEach((value, index) => str += (index + 1) + '. ' + emojis[value] + '\n');
+    game.dices = result;
+    var str = toEmoji(result);
     bot.sendMessage(fromId, 'Result:\n' + str);
-    game.state = GameStates.DICESELECT;
+    var delay=500; //1 second
+    setTimeout(function() {
+       changeDices(fromId, game); 
+    }, delay);
+    //changeDices(fromId, game);
+});
+
+bot.on('callback_query', function(msg) {
+    var fromId = msg.id;
+    var game = games[msg.message.chat.id];
+
+    if (game.state === GameStates.DICESELECT) {
+        if (msg.data.contains('dice_')) {
+            var options = {};
+
+            if (msg.data === 'dice_done') {
+                bot.answerCallbackQuery(fromId, 'Dice change cancelled');
+                var dicesToChange = [];
+                game.selected_dices.forEach((value, index) => {
+                    if (value)
+                        dicesToChange.push(index);
+                });
+                console.log(dicesToChange);
+                var newDices = rollDices(dicesToChange.length);
+                dicesToChange.forEach((value, index) => {
+                    game.dices[value] = newDices[index];
+                });
+
+                var emoji = toEmoji(game.dices);
+                bot.sendMessage(msg.message.chat.id, 'Final result:\n' + emoji);
+            }
+            else {
+                var index = parseInt(msg.data.replace('dice_', ''));
+                game.selected_dices[index] = !game.selected_dices[index];
+                options['inline_keyboard'] = createDiceKeyboard(game);
+            }
+
+            bot.editMessageText(msg.message.text, {
+                    'message_id': msg.message.message_id,
+                    'chat_id': msg.message.chat.id,
+                    'reply_markup': options
+                });
+        }
+    }
 });
 
 function gameIsRunning(gameId) {
@@ -148,4 +201,52 @@ function rollDices(amount) {
         console.log(dices[i]);
     }
     return dices;
+}
+
+function changeDices(chatId, game) {
+    game.state = GameStates.DICESELECT;
+
+    var cancelKeyboard = {
+        'inline_keyboard': createDiceKeyboard(game)
+    };
+
+    bot.sendMessage(chatId, 'Want to change any dice?\nWrite the dice positions on your checkbox.', {'reply_markup': cancelKeyboard});
+}
+
+function createDiceKeyboard(game) {
+    var diceKeyboard = [];
+    for (var i = 0; i < game.dices.length; i++) {
+        console.log(game.dices[i]);
+        var value = createDiceKey(emojis[game.dices[i]], game.selected_dices[i], ['{', '}']);
+        diceKeyboard.push({'text': value, 'callback_data': 'dice_' + i});
+    }
+
+    console.log(diceKeyboard);
+
+    var keyboard = [
+        diceKeyboard,
+        [
+            {
+                'text': 'Done',
+                'callback_data': 'dice_done'
+            }
+        ]
+    ];
+
+    return keyboard;
+}
+
+function toEmoji(dices) {
+    str = '';
+    dices.forEach((value, index) => str += (index + 1) + '. ' + emojis[value] + '\n');
+    return str;
+}
+
+function createDiceKey(value, selected, marks) {
+    var msg = value;
+    if (selected) {
+        msg = marks[0] + value + marks[1];
+    }
+
+    return msg;
 }
