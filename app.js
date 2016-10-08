@@ -48,3 +48,30 @@ bot.onText(/\/end/, function(msg) {
         bot.sendMessage(fromId, 'No games running.');
     }
 });
+
+bot.onText(/\/join/, function(msg) {
+    var fromId = msg.chat.id;
+    var game = games[fromId];
+
+    if (game === undefined) {
+        bot.sendMessage(fromId, 'There is no game running on this chat!');
+    }
+    else if (!game.join) {
+        bot.sendMessage(fromId, 'This game is not accepting more players!');
+    }
+    else if (game.players.some((value, index, array) => value.id === msg.from.id)) {
+        bot.sendMessage(fromId, 'You are already registered', {'reply_to_message_id': msg.message_id});
+    }
+    else {
+        var player = {
+            'id': msg.from.id,
+            'name': msg.from.username,
+            'life': 10,
+            'score': 0,
+            'power': 0
+        };
+        game.players.push(player);
+
+        bot.sendMessage(fromId, 'Player @' + msg.from.username + ' joined');
+    }
+});
