@@ -69,7 +69,10 @@ bot.onText(/\/start/, function(msg) {
 bot.onText(/\/close/, function(msg) {
     var fromId = msg.chat.id;
     var game = games[fromId];
-    if (game.join === true) {
+    if (game.player.length < 2) {
+        bot.sendMessage(fromId, 'You need at least 2 players');
+    }
+    else if (game.join === true) {
         game.join = false;
         //bot.sendMessage(fromId, 'No more players are accepted.');
         game.currentPlayer = game.players[0];
@@ -106,6 +109,9 @@ bot.onText(/\/join/, function(msg) {
     }
     else if (game.players.some((value, index, array) => value.id === msg.from.id)) {
         bot.sendMessage(fromId, 'You are already registered', {'reply_to_message_id': msg.message_id});
+    }
+    else if (game.players.length > 6) {
+        bot.sendMessage(fromIs, 'There are too many players!');
     }
     else {
         var player = {
