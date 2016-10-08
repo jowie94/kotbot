@@ -393,7 +393,7 @@ function resolve(game) {
     }
 
     num.forEach((value, index) => {
-        if (value > 3) {
+        if (value >= 3) {
             new_score += index + 1 + value - 3;
         }
     });
