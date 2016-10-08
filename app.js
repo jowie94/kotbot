@@ -51,6 +51,8 @@ bot.onText(/\/start/, function(msg) {
         bot.sendMessage(fromId,'Game already started');
     }
     else {
+        console.log('Game started, game id: ' + fromId);
+        console.log(games.length + ' games in total running');
         var game = {
             'id': fromId,
             'players': [],
@@ -73,6 +75,7 @@ bot.onText(/\/close/, function(msg) {
         bot.sendMessage(fromId, 'You need at least 2 players');
     }
     else if (game.join === true) {
+        console.log('Game ' + fromId + ' starts with ' + game.players.length + ' players');
         game.join = false;
         //bot.sendMessage(fromId, 'No more players are accepted.');
         game.currentPlayer = game.players[0];
@@ -267,7 +270,6 @@ function rollDices(amount) {
     var dices = [];
     for (i = 0; i < amount; i++) { 
         dices[i] = Math.floor(Math.random() * 11)%6;
-        console.log(dices[i]);
     }
     return dices;
 }
@@ -286,12 +288,9 @@ function changeDices(chatId, game) {
 function createDiceKeyboard(game) {
     var diceKeyboard = [];
     for (var i = 0; i < game.dices.length; i++) {
-        console.log(game.dices[i]);
         var value = createDiceKey(emojis[game.dices[i]], game.selected_dices[i], ['{', '}']);
         diceKeyboard.push({'text': value, 'callback_data': 'dice_' + i});
     }
-
-    console.log(diceKeyboard);
 
     var keyboard = [
         diceKeyboard,
