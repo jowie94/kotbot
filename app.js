@@ -204,7 +204,10 @@ function beginRollDice(chatId, player, game) {
         'one_time_keyboard': true,
         'selective': true
     };
-    bot.sendMessage(chatId, '@' + player.name + ' roll the dice, please', {'reply_markup': keyboard});
+    var delay=500; //1 second
+    setTimeout(function() {
+        bot.sendMessage(chatId, '@' + player.name + ' roll the dice, please', {'reply_markup': keyboard});
+    }, delay);
 }
 
 function rollDices(amount) {
@@ -223,7 +226,8 @@ function changeDices(chatId, game) {
         'inline_keyboard': createDiceKeyboard(game)
     };
 
-    bot.sendMessage(chatId, 'Want to change any dice?\nWrite the dice positions on your checkbox.', {'reply_markup': cancelKeyboard});
+    bot.sendMessage(chatId, '@' + game.currentPlayer.name + ' do you want to change any dice?\nWrite the dice positions on your checkbox.', {'reply_markup': cancelKeyboard});
+
 }
 
 function createDiceKeyboard(game) {
@@ -268,7 +272,17 @@ function endTurn(chatId, game) {
     game.dices = [-1, -1, -1, -1, -1, -1];
     game.selected_dices = [false, false, false, false, false, false]
     game.currentPlayer = game.players[++game.currentPlayerPos % game.players.length]
-    //p = (game.currentPlayer + 1) % game.players.length;
+    var todelete = [];
+    game.players.forEach((value, index) => {
+        if (value.life === 0) {
+            todelete.push(index);
+        }
+    });
+
+    todelete.forEach((value, index) => {
+        game.players.splice(value-index, 1);
+    });
+
     beginRollDice(chatId, game.currentPlayer, game) 
 }
 
@@ -283,7 +297,7 @@ function resolve(game) {
     }
     var old_energy = game.currentPlayer.energy;
     var old_lifes = game.players.map((value) => value.life);
-    game.dices.forEach((value) => {
+    
         if (value < 3) {
             num[value]++;
         }
@@ -309,7 +323,7 @@ function resolve(game) {
 
     game.players.filter((value, index) => value.id !== game.currentPlayer.id && value.life < old_lifes[index].life)
         .forEach((value) => {
-            msg += '@' + value.name + ' lost ' + life_taken + ' points of life:' + value.life + '\n';
+            msg += '@' + value.name + ' lost ' + life_taken + ' points of life: ' + value.life + '\n';
         });
 
     if (msg) {
@@ -340,13 +354,15 @@ function attack(game) {
     if (game.currentPlayer.id === game.tokyo.id) {
         game.players.filter((value) => value.id !== game.currentPlayer.id).forEach((value) => {
             value.life--;
+            checkPlayerLife(value);
         });
     }
     else {
         game.tokyo.life--;
+        checkPlayerLife(game.tokyo);
     }
 }
 
 function checkPlayerLife(player) {
-
+    if (player.life < 0) player.life = 0;
 }
