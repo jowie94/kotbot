@@ -188,6 +188,46 @@ bot.on('callback_query', function(msg) {
     }
 });
 
+bot.onText(/Yes, I want to leave Tokyo/, function (msg) {
+    var fromId = msg.chat.id;
+
+    if (!gameIsRunning(fromId)) {
+        bot.sendMessage(fromId, 'There is no game running on this chat!');
+        return;
+    }
+
+    var game = games[fromId];
+    if (game.tokyo.id !== msg.from.id) {
+        bot.sendMessage(fromId, 'It isn\'t your turn', {'reply_to_message_id': msg.message_id});
+        return;
+    }
+
+    if (game.state === GameStates.RESOLVE) {
+        game.tokyo = game.currentPlayer;
+        bot.sendMessage(game.id, 'The new King of Tokyo is @' + game.tokyo.name);
+        endTurn(fromId, game);
+    }
+});
+
+bot.onText(/No, I don't want to leave Tokyo/, function (msg) {
+    var fromId = msg.chat.id;
+
+    if (!gameIsRunning(fromId)) {
+        bot.sendMessage(fromId, 'There is no game running on this chat!');
+        return;
+    }
+
+    var game = games[fromId];
+    if (game.tokyo.id !== msg.from.id) {
+        bot.sendMessage(fromId, 'It isn\'t your turn', {'reply_to_message_id': msg.message_id});
+        return;
+    }
+
+    if (game.state === GameStates.RESOLVE) {
+        endTurn(fromId, game);
+    }
+});
+
 function gameIsRunning(gameId) {
     return gameIsStarted(gameId) && !games[gameId].join;
 }
@@ -287,6 +327,7 @@ function endTurn(chatId, game) {
 }
 
 function resolve(game) {
+    game.state = GameStates.RESOLVE;
     var num = [0, 0, 0];
     var move = false;
     var life_taken = 0;
@@ -341,7 +382,7 @@ function resolve(game) {
             'resize_keyboard': true,
             'one_time_keyboard': true,
             'selective': true,
-            'keyboard': [['Yes, I want to leave tokyo', 'No, I don\'t want to leave tokyo']]
+            'keyboard': [['Yes, I want to leave Tokyo', 'No, I don\'t want to leave Tokyo']]
         };
         
         bot.sendMessage(game.id, '@' + game.tokyo.name + ' do you want to leave tokyo?', {'reply_markup': keyboard});
