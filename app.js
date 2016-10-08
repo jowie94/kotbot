@@ -359,6 +359,7 @@ function resolve(game) {
     }
     var old_energy = game.currentPlayer.energy;
     var old_lifes = game.players.map((value) => value.life);
+    var new_score = 0;
     game.dices.forEach((value) => {
         if (value < 3) {
             num[value]++;
@@ -381,6 +382,12 @@ function resolve(game) {
         bot.sendMessage(game.id, '@' + game.currentPlayer.name + '\'s life increased ' + (game.currentPlayer.life - old_life) + ' point(s)');
     }
 
+    num.forEach((value, index) => {
+        if (value > 3) {
+            new_score += index + 1 + value - 3;
+        }
+    });
+
     var msg = '';
 
     game.players.filter((value, index) => value.id !== game.currentPlayer.id && value.life < old_lifes[index])
@@ -394,14 +401,16 @@ function resolve(game) {
 
     if (move) {
         game.tokyo = game.currentPlayer;
-        score(game.id, game.currentPlayer, 1);
+        new_score += 1;
         bot.sendMessage(game.id, 'The new King of Tokyo is @'+game.currentPlayer.name);
     }
 
     if (game.currentPlayer.energy >= 5) {
-        score(game.id, game.currentPlayer, Math.floor(game.currentPlayer.energy / 5));
+        new_score += Math.floor(game.currentPlayer.energy / 5)
         game.currentPlayer.energy %= 5;
     }
+
+    score(game.id, game.currentPlayer, new_score);
 
     if (game.tokyo && game.currentPlayer.id !== game.tokyo.id && old_tokyo > game.tokyo.life) {
         var keyboard = {
