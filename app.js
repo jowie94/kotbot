@@ -159,6 +159,27 @@ bot.onText(/Roll the dice/, function(msg) {
     //changeDices(fromId, game);
 });
 
+bot.onText(/\/stats/, function (msg) {
+    if (!gameIsRunning(fromId)) {
+        bot.sendMessage(fromId, 'There is no game running on this chat!');
+        return;
+    }
+
+    var game = games[fromId];
+    var result = game.players.filter((player) => player.id === msg.from.id);
+    if (result.length != 1) {
+        bot.sendMessage(fromId, 'You aren\'t currently playing');
+    }
+    else {
+        var player = result[0];
+        var msg = '@' + player.name + ' stats:\n' + createStats(player);
+        if (player.id === game.tokyo.id) {
+            msg += '\n- You\'re in Tokyo';
+        }
+        bot.sendMessage(fromId, msg);
+    }
+});
+
 bot.on('callback_query', function(msg) {
     var fromId = msg.id;
     var game = games[msg.message.chat.id];
@@ -322,8 +343,7 @@ function createDiceKey(value, selected, marks) {
 
 function endTurn(chatId, game) {
     bot.sendMessage(chatId, 
-        '@' + game.currentPlayer.name + ' stats:\n- ' + emojis[6] + ': ' + game.currentPlayer.score
-        + '\n- ' + emojis[dices.HEART] + ': ' + game.currentPlayer.life + '\n- ' + emojis[dices.ENERGY] + ': ' + game.currentPlayer.energy);
+        '@' + game.currentPlayer.name + ' stats:\n' + createStats(game.currentPlayer);
     game.dices = [-1, -1, -1, -1, -1, -1];
     game.selected_dices = [false, false, false, false, false, false]
     var todelete = [];
@@ -350,7 +370,7 @@ function endTurn(chatId, game) {
     }
     else {
         game.currentPlayer = game.players[++game.currentPlayerPos % game.players.length]
-        
+
         if (game.tokyo && game.currentPlayer.id === game.tokyo.id) {
             score(chatId, game.currentPlayer, 2);
         }
@@ -462,6 +482,12 @@ function win(chatId, player) {
 function score(chatId, player, amount) {
     player.score += amount;
     bot.sendMessage(chatId, 'Player @' + player.name + ' scored ' + amount + ' points.')
+}
+
+function createStats(player) {
+    return '- ' + emojis[6] + ': ' + player.score
+        + '\n- ' + emojis[dices.HEART] + ': ' + player.life 
+        + '\n- ' + emojis[dices.ENERGY] + ': ' + player.energy;
 }
 
 console.log('Server started!');
