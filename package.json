@@ -2,7 +2,7 @@
   "name": "kotbot",
   "version": "1.0.0",
   "description": "A King of Tokio bot for Telegram",
-  "main": "app.ja",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,6 +11,7 @@
     "bot",
     "telegram"
   ],
+  "scripts" : { "start" : "node app.js" },
   "author": "Zekken & Jowie",
   "license": "ISC",
   "dependencies": {
