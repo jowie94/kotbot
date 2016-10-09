@@ -520,7 +520,7 @@ server.listen(PORT, function(){
 
 bot.onText(/help/, function (msg) {
     var fromId = msg.chat.id;
-    bot.sendMessage(fromId, 'Welcome to King of Telegram!' +
+    bot.sendMessage(fromId, 'Welcome to King of Telegram!\n\n' +
 
 '1. Add this bot to a group.\n' +
 '2. In the group, start a new game with /start or join an already running game with /join.\n' +
@@ -548,7 +548,7 @@ bot.onText(/help/, function (msg) {
 '     + If you are in Tokyo, you will deal damage to players outside Tokyo.\n' +
 '     + If you aren\'t in Tokyo, you will deal damage to the player who is controlling Tokyo.\n\n' +
 
-'- Each ' + emojis[dices.HEART] + ' dice will increase in one your life points. The maximum number of life points you can get is 10 and you can only heal up if you are not in Tokyo.\n' +
+'- Each ' + emojis[dices.HEART] + ' dice will increase in one your life points. The maximum number of life points you can get is 10 and you can only heal up if you are not in Tokyo.\n\n' +
 
 '3- Become the king of Tokyo: At the beginning of the game, the first player to get a ' + emojis[dices.ATTACK] + ' will get the control of Tokyo. If you are attacked while being in Tokyo, you can give your spot in Tokyo to the attacker and return to the outside. If you die while you are in Tokyo, the player who attacked you automatically gets the control of Tokyo.\n');
     
