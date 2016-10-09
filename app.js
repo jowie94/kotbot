@@ -37,7 +37,8 @@ var emojis = [
     '\u26A1',
     '\u2694',
     '\u2665',
-    '\u2B50'
+    '\u2B50',
+    '\uD83D\uDC51'
 ]
 
 bot.onText(/\/echo/, function(msg) {
@@ -349,8 +350,8 @@ function createDiceKey(value, selected, marks) {
 }
 
 function endTurn(chatId, game) {
-    bot.sendMessage(chatId, 
-        '@' + game.currentPlayer.name + ' stats:\n' + createStats(game.currentPlayer));
+    // bot.sendMessage(chatId, 
+    //     '@' + game.currentPlayer.name + ' stats:\n' + createStats(game.currentPlayer));
     game.dices = [-1, -1, -1, -1, -1, -1];
     game.selected_dices = [false, false, false, false, false, false]
     var todelete = [];
@@ -381,6 +382,15 @@ function endTurn(chatId, game) {
         if (game.tokyo && game.currentPlayer.id === game.tokyo.id) {
             score(chatId, game.currentPlayer, 2);
         }
+        var stats = '';
+        game.players.forEach((player) => {
+            if (game.tokyo.id === player.id) {
+                stats += emojis[7] + ' ';
+            }
+            stats += '@' + player.name + ' ' + emojis[6] + ' ' + player.score + ' | ' + emojis[dices.HEART] + ' ' + player.life
+                + ' | ' + emojis[dices.ENERGY] + ' ' + player.energy + '\n';
+        });
+        bot.sendMessage(chatId, stats);
         beginRollDice(chatId, game.currentPlayer, game);
     } 
 }
