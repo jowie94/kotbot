@@ -34,3 +34,5 @@ Your goal is to be the first to achieve 20 stars :smile: (or be the last monkey 
 	- Each :heart: dice will increase in one your life points. The maximum number of life points you can get is 10 and you can only heal up if you are not in Tokyo.
 
 3. Become the king of Tokyo :crown:: At the beginning of the game, the first player to get a ⚔ dice will get the control of Tokyo. If you are attacked while being in Tokyo, you can give your spot in Tokyo to the attacker and return to the outside. If you die while you are in Tokyo, the player who attacked you automatically gets the control of Tokyo.
+
+Enjoy! :octocat:
