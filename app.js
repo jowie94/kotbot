@@ -245,6 +245,7 @@ bot.onText(/Yes, I want to leave Tokyo/, function (msg) {
     if (game.state === GameStates.RESOLVE) {
         game.tokyo = game.currentPlayer;
         bot.sendMessage(game.id, 'The new King of Tokyo is @' + game.tokyo.name);
+        score(fromId, game.tokyo, 1);
         endTurn(fromId, game);
     }
 });
@@ -362,6 +363,7 @@ function endTurn(chatId, game) {
             if (game.tokyo && value.id === game.tokyo.id) {
                 game.tokyo = game.currentPlayer;
                 bot.sendMessage(game.id, 'The new King of Tokyo is @'+game.currentPlayer.name);
+                score(fromId, game.tokyo, 1);
             }
         }
     });
