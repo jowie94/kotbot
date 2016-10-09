@@ -517,3 +517,39 @@ server.listen(PORT, function(){
     //Callback triggered when server is successfully listening. Hurray!
     console.log("Server listening on: http://localhost:%s", PORT);
 });
+
+bot.onText(/help/, function (msg) {
+    var fromId = msg.chat.id;
+    bot.sendMessage(fromId, 'Welcome to King of Telegram!' +
+
+'1. Add this bot to a group.\n' +
+'2. In the group, start a new game with /start or join an already running game with /join.\n' +
+'3. After at least two players have joined, start the game with /close. Once closed, nobody else can participate.\n\n' +
+
+'-GOAL:\n' +
+'Be the first to achieve 20 stars or become the last standing man!\n\n' +
+
+'-How to play:\n' +
+
+'1- Roll the dices: at the starting of your turn, you must roll the 6 dices. After that, you can pick any subset of dices and roll them again.\n\n' +
+
+'2- Resolve the dices: The symbols you get after rolling the dices are the actions you can take during this turn:\n' +
+
+'    ' + emojis[dices.ONE] + ', ' + emojis[dices.TWO] + ', ' + emojis[dices.THREE] + ': Score Points\n' +
+'    ' + emojis[dices.ENERGY] + ': Energy\n' +
+'    ' + emojis[dices.ATTACK] + ': Attack\n' +
+'    ' + emojis[dices.HEART] + ': Life\n\n' +
+
+'- If you get a triple ' + emojis[dices.ONE] + ', ' + emojis[dices.TWO] + ' or ' + emojis[dices.THREE] + ', your ' + emojis[6] + ' will increase equally to the number of the dices. Each additional repeated value will add an extra ' + emojis[6] + ' point.\n\n' +
+
+'- Each ' + emojis[dices.ENERGY] +' dice will increment your ' + emojis[dices.ENERGY] + ' score. If you get 5 ' + emojis[dices.ENERGY] + ' points, you will be automatically rewarded with an extra ' + emojis[6] + ' point.\n\n' +
+
+'- The total number of ' + emojis[dices.ATTACK] + ' dices you get is the damage you will do this turn.\n' +
+'     + If you are in Tokyo, you will deal damage to players outside Tokyo.\n' +
+'     + If you aren\'t in Tokyo, you will deal damage to the player who is controlling Tokyo.\n\n' +
+
+'- Each ' + emojis[dices.HEART] + ' dice will increase in one your life points. The maximum number of life points you can get is 10 and you can only heal up if you are not in Tokyo.\n' +
+
+'3- Become the king of Tokyo: At the beginning of the game, the first player to get a ' + emojis[dices.ATTACK] + ' will get the control of Tokyo. If you are attacked while being in Tokyo, you can give your spot in Tokyo to the attacker and return to the outside. If you die while you are in Tokyo, the player who attacked you automatically gets the control of Tokyo.\n');
+    
+});
