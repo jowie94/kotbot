@@ -358,7 +358,7 @@ function endTurn(chatId, game) {
         if (value.life === 0) {
             todelete.push(index);
             bot.sendMessage(chatId, '@' + value.name + ' is dead')
-            if (game.tokyo && value.id === game.tokyo) {
+            if (game.tokyo && value.id === game.tokyo.id) {
                 game.tokyo = game.currentPlayer;
                 bot.sendMessage(game.id, 'The new King of Tokyo is @'+game.currentPlayer.name);
             }
