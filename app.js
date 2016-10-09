@@ -304,6 +304,11 @@ function changeDices(chatId, game) {
         'inline_keyboard': createDiceKeyboard(game)
     };
 
+    if (game.tokyo) {
+        bot.sendMessage(chatId, '@' + game.tokyo.name + ' is currently in Tokyo');
+    } else {
+        bot.sendMessage(chatId, 'No one is in Tokyo');
+    }
     bot.sendMessage(chatId, '@' + game.currentPlayer.name + ' do you want to change any dice?', {'reply_markup': cancelKeyboard});
 
 }
@@ -445,7 +450,7 @@ function resolve(game) {
 
     score(game.id, game.currentPlayer, new_score);
 
-    if (game.tokyo && game.currentPlayer.id !== game.tokyo.id && old_tokyo > game.tokyo.life) {
+    if (game.tokyo && game.currentPlayer.id !== game.tokyo.id && old_tokyo > game.tokyo.life && game.tokyo.life > 0) {
         var keyboard = {
             'resize_keyboard': true,
             'one_time_keyboard': true,
