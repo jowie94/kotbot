@@ -363,7 +363,7 @@ function endTurn(chatId, game) {
             if (game.tokyo && value.id === game.tokyo.id) {
                 game.tokyo = game.currentPlayer;
                 bot.sendMessage(game.id, 'The new King of Tokyo is @'+game.currentPlayer.name);
-                score(fromId, game.tokyo, 1);
+                score(chatId, game.tokyo, 1);
             }
         }
     });
@@ -375,7 +375,7 @@ function endTurn(chatId, game) {
     if (game.players.length === 1) {
         win(chatId, game.players[0]);
     }
-    else if (game.currentPlayer.scores >= 20) {
+    else if (game.currentPlayer.score >= 20) {
         win(chatId, game.currentplayer);
     }
     else {
@@ -386,7 +386,7 @@ function endTurn(chatId, game) {
         }
         var stats = '';
         game.players.forEach((player) => {
-            if (game.tokyo.id === player.id) {
+            if (game.tokyo && game.tokyo.id === player.id) {
                 stats += emojis[7] + ' ';
             }
             stats += '@' + player.name + ' ' + emojis[6] + ' ' + player.score + ' | ' + emojis[dices.HEART] + ' ' + player.life
