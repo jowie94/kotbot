@@ -377,6 +377,7 @@ function endTurn(chatId, game) {
     }
     else if (game.currentPlayer.score >= 20) {
         win(chatId, game.currentplayer);
+        win(chatId, game.currentPlayer);
     }
     else {
         game.currentPlayer = game.players[++game.currentPlayerPos % game.players.length]
